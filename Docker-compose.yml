@@ -6,7 +6,7 @@ services:
   cookiecloud:
     image: ghcr.io/workerspages/cookiecloud:cookiecloud-metube-block-server
     container_name: cookiecloud
-    restart: always
+    restart: unless-stopped
     environment:
       # --- 关键配置开始 ---
       # 你的 CookieCloud 扩展里显示的 UUID
