@@ -1,10 +1,51 @@
+# --------------------------------
+# CookieCloud Docker-compose.yml
+# --------------------------------
 version: '3'
 services:
   cookiecloud:
-    image: easychen/cookiecloud:latest
+    # 这里使用你构建好的镜像，或者是刚修改后本地构建的
+    image: ghcr.io/YOUR_GITHUB_USERNAME/cookiecloud:latest 
     container_name: cookiecloud-app
     restart: always
+    environment:
+      # --- 关键配置开始 ---
+      # 你的 CookieCloud 扩展里显示的 UUID
+      - METUBE_UUID=你的UUID
+      # 你的 CookieCloud 扩展里设置的密码
+      - METUBE_PASSWORD=你的密码
+      # 容器内的保存路径
+      - METUBE_COOKIE_FILE=/metube_cookies/cookies.txt
+      # (可选) 过滤域名，避免文件过大，只保存 youtube 相关的
+      - METUBE_DOMAIN_FILTER=youtube.com,google.com
+      # --- 关键配置结束 ---
     volumes:
       - ./data:/data/api/data
+      # 关键挂载：将 Metube 的 cookies 目录挂载到 CookieCloud 容器内
+      - /my_data/docker_data/metube/cookies:/metube_cookies
     ports:
       - 8088:8088
+
+
+# --------------------------------
+# MeTube Docker-compose.yml
+# --------------------------------
+version: "3"
+services:
+  metube:
+    image: ghcr.io/alexta69/metube
+    container_name: metube
+    restart: unless-stopped
+    ports:
+      - "8071:8081"
+    volumes:
+      - ../../downloads/metube:/downloads  # 下载目录
+      - ./cookies:/cookies                 # 下载推特视频需要推特网站的cookies
+    environment:
+      - UID=${PUID}
+      - GID=${PGID}
+      - STATE_DIR=$PWD/.metube
+#     - TEMP_DIR=                                                                          # 下载时缓存文件目录，默认和下载目录相同
+      - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}                                 # 下载推特视频需要推特网站的cookies
+      - OUTPUT_TEMPLATE_CHAPTER=%(title)s - %(section_number)s %(section_title)s.%(ext)s   # 视频分成章节标记
+      - OUTPUT_TEMPLATE=%(title).100B.%(ext)s                                              # 视频标题
