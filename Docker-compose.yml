@@ -16,7 +16,7 @@ services:
       # (可选) 过滤域名，避免文件过大，只保存 youtube 相关的
       - METUBE_DOMAIN_FILTER=youtube.com,google.com
       
-      # SFTP 远程传输配置 (指向服务器 B)
+      # SFTP 远程传输配置 (指向部署了 MeTube 的服务器 B)
       - SFTP_HOST=服务器B的IP地址
       - SFTP_PORT=22
       - SFTP_USER=root (或者其他有权限的用户名)
