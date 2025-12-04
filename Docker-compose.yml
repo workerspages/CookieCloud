@@ -16,7 +16,7 @@ services:
       # 容器内的保存路径
       - METUBE_COOKIE_FILE=/metube_cookies/cookies.txt
       # (可选) 过滤域名，避免文件过大，只保存 youtube 相关的
-      - METUBE_DOMAIN_FILTER=youtube.com,google.com
+    # - METUBE_DOMAIN_FILTER=youtube.com,google.com
       # --- 关键配置结束 ---
     volumes:
       - ./data:/data/api/data
