@@ -5,23 +5,23 @@ version: '3'
 services:
   cookiecloud:
     image: ghcr.io/workerspages/cookiecloud:latest
-    container_name: cookiecloud-app
-    restart: always
+    container_name: cookiecloud
+    restart: unless-stopped
     environment:
       # --- 关键配置开始 ---
       # 你的 CookieCloud 扩展里显示的 UUID
       - METUBE_UUID=你的UUID
       # 你的 CookieCloud 扩展里设置的密码
       - METUBE_PASSWORD=你的密码
-      # 容器内的保存路径
+      # 你的 CookieCloud 扩展获取的cookies 值文件保存容器内的路径
       - METUBE_COOKIE_FILE=/metube_cookies/cookies.txt
       # (可选) 过滤域名，避免文件过大，只保存 youtube 相关的
-    # - METUBE_DOMAIN_FILTER=youtube.com,google.com
+  #   - METUBE_DOMAIN_FILTER=youtube.com,google.com
       # --- 关键配置结束 ---
     volumes:
       - ./data:/data/api/data
-      # 关键挂载：将 Metube 的 cookies 目录挂载到 CookieCloud 容器内
-      - /my_data/docker_data/metube/cookies:/metube_cookies
+      # 关键挂载：将 cookieclou 扩展获取的网站 cookies 值文件目录挂载到 MeTube 内的 cookies
+      - ../metube/cookies:/metube_cookies
     ports:
       - 8088:8088
 
