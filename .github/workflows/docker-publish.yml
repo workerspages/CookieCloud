@@ -2,10 +2,10 @@ name: Docker Build and Publish
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: [ "cookiecloud-metube-block-server" ]
     tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ "master", "main" ]
+    branches: [ "cookiecloud-metube-block-server" ]
 
 env:
   # 使用你的 Docker Hub 用户名
