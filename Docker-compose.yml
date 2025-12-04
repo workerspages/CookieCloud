@@ -4,8 +4,7 @@
 version: '3'
 services:
   cookiecloud:
-    # 这里使用你构建好的镜像，或者是刚修改后本地构建的
-    image: ghcr.io/YOUR_GITHUB_USERNAME/cookiecloud:latest 
+    image: ghcr.io/workerspages/cookiecloud:latest
     container_name: cookiecloud-app
     restart: always
     environment:
