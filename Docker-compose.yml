@@ -5,7 +5,7 @@ version: '3'
 services:
   cookiecloud:
     image: ghcr.io/workerspages/cookiecloud:cookiecloud-metube-block-server
-    container_name: cookiecloud-app
+    container_name: cookiecloud
     restart: always
     environment:
       # --- 关键配置开始 ---
