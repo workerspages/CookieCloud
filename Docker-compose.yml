@@ -4,24 +4,30 @@
 version: '3'
 services:
   cookiecloud:
-    image: ghcr.io/workerspages/cookiecloud:latest
-    container_name: cookiecloud
-    restart: unless-stopped
+    image: ghcr.io/workerspages/cookiecloud:cookiecloud-metube-block-server
+    container_name: cookiecloud-app
+    restart: always
     environment:
-      # --- 关键配置开始 ---
-      # 你的 CookieCloud 扩展里显示的 UUID
-      - METUBE_UUID=你的UUID
-      # 你的 CookieCloud 扩展里设置的密码
-      - METUBE_PASSWORD=你的密码
-      # 你的 CookieCloud 扩展获取的cookies 值文件保存容器内的路径
-      - METUBE_COOKIE_FILE=/metube_cookies/cookies.txt
-      # (可选) 过滤域名，避免文件过大，只保存 youtube 相关的
-  #   - METUBE_DOMAIN_FILTER=youtube.com,google.com
-      # --- 关键配置结束 ---
+      # 解密配置
+      - METUBE_UUID=你的扩展UUID
+      - METUBE_PASSWORD=你的扩展密码
+      # 域名过滤（强烈建议设置，减少传输大小）
+      - METUBE_DOMAIN_FILTER=youtube.com,google.com
+      
+      # SFTP 远程传输配置 (指向服务器 B)
+      - SFTP_HOST=服务器B的IP地址
+      - SFTP_PORT=22
+      - SFTP_USER=root (或者其他有权限的用户名)
+      - SFTP_PASSWORD=服务器B的SSH密码
+      # 或者使用 SSH Key (需将 key 挂载进容器)
+      # - SFTP_PRIVATE_KEY=/ssh_keys/id_rsa
+      
+      # 目标路径 (服务器B上的绝对路径)
+      - SFTP_REMOTE_PATH=/my_data/docker_data/metube/cookies/cookies.txt
     volumes:
       - ./data:/data/api/data
-      # 关键挂载：将 cookieclou 扩展获取的网站 cookies 值文件目录挂载到 MeTube 内的 cookies
-      - ../metube/cookies:/metube_cookies
+      # 如果使用 SSH Key 认证
+      # - /root/.ssh/id_rsa:/ssh_keys/id_rsa:ro
     ports:
       - 8088:8088
 
@@ -29,22 +35,18 @@ services:
 # --------------------------------
 # MeTube Docker-compose.yml
 # --------------------------------
-version: "3"
+version: '3'
 services:
   metube:
-    image: ghcr.io/alexta69/metube
+    image: alexta69/metube
     container_name: metube
     restart: unless-stopped
     ports:
-      - "8071:8081"
+      - "8081:8081"
     volumes:
-      - ../../downloads/metube:/downloads  # 下载目录
-      - ./cookies:/cookies                 # 下载推特视频需要推特网站的cookies
-    environment:
-      - UID=${PUID}
-      - GID=${PGID}
-      - STATE_DIR=$PWD/.metube
-#     - TEMP_DIR=                                                                          # 下载时缓存文件目录，默认和下载目录相同
-      - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}                                 # 下载推特视频需要推特网站的cookies
-      - OUTPUT_TEMPLATE_CHAPTER=%(title)s - %(section_number)s %(section_title)s.%(ext)s   # 视频分成章节标记
-      - OUTPUT_TEMPLATE=%(title).100B.%(ext)s                                              # 视频标题
+      - ./downloads:/downloads
+      # 这里的 ./cookies 对应服务器 A 中 SFTP_REMOTE_PATH 指向的目录
+      # 例如如果服务器A写的是 /my_data/docker_data/metube/cookies/cookies.txt
+      # 那么服务器B这里挂载的 ./cookies 应该就是 /my_data/docker_data/metube/cookies
+      - ./cookies:/cookies
+    # Metube 会自动检测 /cookies/cookies.txt，无需额外环境变量配置
